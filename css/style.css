@@ -1,0 +1,25 @@
+/*
+ * Full-screen black background for the application.
+ */
+body {
+	margin: 0;
+	overflow: hidden;
+	background-color: black;
+}
+
+/*
+ * Styles for the container that holds the AVPlay player object.
+ */
+#player-container object {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	
+	/*
+	 * CRITICAL: The z-index ensures the native video rendering plane is layered
+	 * on top of the HTML body, preventing the "black screen with audio" issue.
+	 */
+	z-index: 100;
+}
