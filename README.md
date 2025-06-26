@@ -1,112 +1,70 @@
-Emel TV - Tizen Stream Player
+# Emel TV - Tizen Stream Player
+
 A simple and robust Tizen web application designed to play a full-screen HLS video stream on Samsung Smart TVs. This project serves as a lightweight template for TV-based streaming applications, incorporating essential lifecycle management and common troubleshooting fixes.
 
-Features
-Plays a specified HLS (.m3u8) stream upon launch.
+## Features
 
-Full-screen video playback.
+- Plays a specified HLS (.m3u8) stream upon launch.
+- Full-screen video playback.
+- Handles basic remote control events (Play, Pause, Return/Exit).
+- Correctly manages the application lifecycle (pausing on hide, cleaning up on exit) to prevent resource allocation errors on the TV.
+- Includes necessary fixes for common Tizen development issues like the "black screen with audio" problem.
 
-Handles basic remote control events (Play, Pause, Return/Exit).
+## Tech Stack
 
-Correctly manages the application lifecycle (pausing on hide, cleaning up on exit) to prevent resource allocation errors on the TV.
+- **HTML5**: For the basic application structure.
+- **CSS3**: For styling the player container.
+- **JavaScript (ES6+)**: For all application logic.
+- **Tizen Web API**: Specifically `webapis.avplay` for media playback and `tizen.application` for app control.
 
-Includes necessary fixes for common Tizen development issues like the "black screen with audio" problem.
+## Project Structure
 
-Tech Stack
-HTML5: For the basic application structure.
-
-CSS3: For styling the player container.
-
-JavaScript (ES6+): For all application logic.
-
-Tizen Web API: Specifically webapis.avplay for media playback and tizen.application for app control.
-
-Project Structure
 The project follows a standard Tizen web application structure. Key source files include:
 
-.
+```
 ├── css/
-│ └── style.css # Styles for the player object and body
-├── config.xml # Tizen application configuration, privileges, and metadata
-├── icon.png # Application icon
-├── index.html # Entry point of the application
-└── main.js # Main application logic
+│   └── style.css       # Styles for the player object and body
+├── config.xml          # Tizen application configuration, privileges, and metadata
+├── icon.png            # Application icon
+├── index.html          # Entry point of the application
+└── main.js             # Main application logic
+```
 
-Setup and Installation
-To run this application, you will need Tizen Studio installed and configured for TV development.
+## Setup and Installation
 
-Clone the Repository:
+To run this application, you will need [Tizen Studio](https://developer.tizen.org/development/tizen-studio/download) installed and configured for TV development.
 
-git clone <your-repository-url>
+1.  **Clone the Repository:**
 
-Import Project:
+    ```bash
+    git clone <your-repository-url>
+    ```
 
-Open Tizen Studio.
+2.  **Import Project:**
 
-Go to File > Import....
+    - Open Tizen Studio.
+    - Go to `File > Import...`.
+    - Select `Tizen > Tizen Project` and navigate to the cloned repository folder.
+    - Import the project.
 
-Select Tizen > Tizen Project and navigate to the cloned repository folder.
+3.  **Build the Project:**
 
-Import the project.
+    - Right-click the project in the Project Explorer.
+    - Select `Build Project`. This will generate a `.wgt` (widget) file.
 
-Build the Project:
+4.  **Run on a Device:**
+    - Connect your Samsung TV to Tizen Studio via the Device Manager.
+    - Right-click the project.
+    - Select `Run As > Tizen Web Application`.
+    - Ensure your TV is selected as the target. The application will be installed and launched on the TV.
 
-Right-click the project in the Project Explorer.
+## Configuration
 
-Select Build Project. This will generate a .wgt (widget) file.
+To change the video stream, edit the `STREAM_URL` constant in `main.js`:
 
-Run on a Device:
-
-Connect your Samsung TV to Tizen Studio via the Device Manager.
-
-Right-click the project.
-
-Select Run As > Tizen Web Application.
-
-Ensure your TV is selected as the target. The application will be installed and launched on the TV.
-
-Configuration
-To change the video stream, edit the STREAM_URL constant in main.js:
-
+```javascript
 // main.js
 
 // The URL of the HLS stream to be played.
-const STREAM_URL = 'https://your-new-stream-url.m3u8';
-
-Key Learnings & Troubleshooting
-This project addresses several common and critical issues encountered during Tizen TV development:
-
-1. Resource Allocation Failure
-   Symptom: The app fails to launch with a "Resource Allocation Failure" error, often mentioning a tvs-daemon process.
-
-Cause: The application did not properly release the AVPlay hardware decoder resource when it was closed previously.
-
-Solution: Implement a cleanupPlayer() function that calls webapis.avplay.stop() and, most importantly, webapis.avplay.close(). This function must be called whenever the user exits (via the 'Return' key) or hides the application (via the 'Home' key or switching apps).
-
-2. Black Screen with Audio Playing
-   Symptom: The stream's audio can be heard, but the screen remains black.
-
-Cause 1: Missing Privileges. The config.xml file lacks the necessary permissions to access the internet or the AVPlay API.
-
-Solution: Ensure these privileges are present in config.xml:
-
-<tizen:privilege name="[http://tizen.org/privilege/internet](http://tizen.org/privilege/internet)"/>
-<tizen:privilege name="[http://developer.samsung.com/privilege/avplay](http://developer.samsung.com/privilege/avplay)"/>
-
-Cause 2: Rendering Race Condition. The JavaScript attempts to use the AVPlay object before the TV's web engine has fully rendered it in the DOM.
-
-Solution: Wrap the call to startPlayback() in a short setTimeout to push its execution to the end of the event queue, giving the DOM time to initialize.
-
-setTimeout(startPlayback, 100);
-
-Cause 3: CSS Stacking Order. The native video plane is rendered behind the black background of the HTML <body>.
-
-Solution: Add a z-index with a positive value to the player object's CSS to ensure it is layered on top.
-
-#player-container object {
-z-index: 100;
-}
-
-Cause 4: TV-level "Picture Off" Setting. A hardware setting on the TV itself may be enabled, which intentionally turns off the screen for audio-only experiences.
-
-Solution: Manually check the TV's settings menu (often under Accessibility or Power and Energy Saving) and disable any feature named "Picture Off" or "Audio Only".
+const STREAM_URL = "https://your-new-stream-url.m3u8";
+```
